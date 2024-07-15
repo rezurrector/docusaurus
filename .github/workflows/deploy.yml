@@ -1,4 +1,4 @@
-name: Deploy to Bluehost
+name: Deploy to Bluehost via SFTP
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "20" # Ensure compatibility with your project
 
       - name: Install dependencies
         run: npm install
@@ -24,11 +24,17 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Deploy to Bluehost
-        uses: easingthemes/ssh-deploy@v2.2.7
-        with:
-          REMOTE_HOST: docs.rezurrector.com
-          REMOTE_USER: angelrob
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: ./build
-          TARGET: /home2/angelrob/docs.rezurrector.com
+      - name: Deploy via SFTP
+        run: |
+          echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "Host docs.rezurrector.com" >> ~/.ssh/config
+          echo "  Port 22" >> ~/.ssh/config
+          echo "  User angelrob" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
+          sftp -b - docs.rezurrector.com <<EOF
+            put -r ./build /home2/angelrob/docs.rezurrector.com
+            quit
+          EOF
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
