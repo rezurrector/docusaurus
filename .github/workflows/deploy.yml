@@ -1,4 +1,4 @@
-name: Deploy on Update
+name: Deploy to Bluehost
 
 on:
   push:
@@ -6,42 +6,25 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20"
+        uses: actions/checkout@v2
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
+      - name: Build application
         run: npm run build
 
-      - name: Configure SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 74.220.209.129 >> ~/.ssh/known_hosts
-          ssh-keyscan -H docs.rezurrector.com >> ~/.ssh/known_hosts
-
-      - name: Test SSH connection
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no angelrob@74.220.209.129 "echo Connection successful"
-
-      - name: Deploy to server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          rsync -avz --delete-after ./build/ angelrob@74.220.209.129:/home2/angelrob/docs.rezurrector.com
+      - name: Deploy to Bluehost
+        uses: easingthemes/ssh-deploy@v2.2.7
+        with:
+          server: your-bluehost-domain.com
+          username: bluehost-username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSWORD }} # If your SSH key has a passphrase
+          local_path: ./build
+          remote_path: /docs.rezurrector.com
