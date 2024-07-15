@@ -24,18 +24,15 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
+
       - name: Deploy via SFTP
         run: |
-          mkdir -p ~/.ssh
-          echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "Host docs.rezurrector.com" >> ~/.ssh/config
-          echo "  Port 22" >> ~/.ssh/config
-          echo "  User angelrob" >> ~/.ssh/config
-          echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
-          sftp -o StrictHostKeyChecking=no -b - docs.rezurrector.com <<EOF
+          sshpass -p "$SSH_PASSWORD" sftp -o StrictHostKeyChecking=no angelrob@docs.rezurrector.com <<EOF
+            mkdir -p /home2/angelrob/docs.rezurrector.com
             put -r ./build/* /home2/angelrob/docs.rezurrector.com
             quit
           EOF
         env:
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
