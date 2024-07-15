@@ -31,7 +31,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 74.220.209.129 >> ~/.ssh/known_hosts
           ssh-keyscan -H docs.rezurrector.com >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=no angelrob@74.220.209.129 "echo Connection successful"
 
       - name: Deploy to server
         run: |
