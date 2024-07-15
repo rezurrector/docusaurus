@@ -27,8 +27,8 @@ jobs:
       - name: Deploy to Bluehost
         uses: easingthemes/ssh-deploy@v2.2.7
         with:
-          server: docs.rezurrector.com
-          username: angelrob
-          password: ${{ secrets.SSH_PASSWORD }}
-          local_path: ./build
-          remote_path: /home2/angelrob/docs.rezurrector.com
+          REMOTE_HOST: docs.rezurrector.com
+          REMOTE_USER: angelrob
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: ./build
+          TARGET: /home2/angelrob/docs.rezurrector.com
