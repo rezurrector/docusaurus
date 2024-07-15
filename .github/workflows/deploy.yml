@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20" # Ensure compatibility with your project
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -26,14 +26,15 @@ jobs:
 
       - name: Deploy via SFTP
         run: |
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Host docs.rezurrector.com" >> ~/.ssh/config
           echo "  Port 22" >> ~/.ssh/config
           echo "  User angelrob" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
-          sftp -b - docs.rezurrector.com <<EOF
-            put -r ./build /home2/angelrob/docs.rezurrector.com
+          sftp -o StrictHostKeyChecking=no -b - docs.rezurrector.com <<EOF
+            put -r ./build/* /home2/angelrob/docs.rezurrector.com
             quit
           EOF
         env:
