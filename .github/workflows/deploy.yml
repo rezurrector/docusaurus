@@ -31,5 +31,5 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H your.server.com >> ~/.ssh/known_hosts
-          rsync -avz --delete-after ./your-build-folder/ your-user@your.server.com:/path/to/remote/folder
+          ssh-keyscan -H docs.rezurrector.com >> ~/.ssh/known_hosts
+          rsync -avz --delete-after ./build/ angelrob@74.220.209.129:/home2/angelrob/docs.rezurrector.com
